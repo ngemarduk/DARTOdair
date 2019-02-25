@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using DinheiroDomain;
+using System.Text;
 
 namespace DinheiroRepository
 {
-    public interface IMoedaInterface
+    public interface IGenRepository<T>
     {
-        IEnumerable<Moeda> Lista();
+        IList<T> Lista();
     }
 }

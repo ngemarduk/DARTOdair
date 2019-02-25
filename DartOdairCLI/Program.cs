@@ -47,29 +47,21 @@ namespace DartOdairCLI
             try
             {
                 DinheirCalculaService dinCalServ = new DinheirCalculaService();
+                
+                retCedula = dinCalServ.DinheiroCalcula(valorTotal, valorPago);
 
-                decimal valorRest = valorPago - valorTotal;
-
-                if(valorRest > 0)
+                if(retCedula != null)
                 { 
-                    retCedula = dinCalServ.DinheiroCalcula(valorRest);
-
-                    if(retCedula != null)
-                    { 
-                        retCedula.ForEach(ret =>
-                        {
-                            Console.WriteLine();
-                            Console.WriteLine(ret);
-                        });
-                    }
-                    else {
-                        Console.WriteLine("Infelizmente não foi possível calcular a quantidade de cédulas e moedas.");
-                    }
+                    retCedula.ForEach(ret =>
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine(ret);
+                    });
                 }
-                else
-                {
-                    Console.WriteLine("O valor pago não é igual ou maior que o total.");
+                else {
+                    Console.WriteLine("Infelizmente não foi possível calcular a quantidade de cédulas e moedas.");
                 }
+               
             }
             catch (Exception ex)
             {

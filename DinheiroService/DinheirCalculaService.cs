@@ -8,116 +8,73 @@ namespace DinheiroService
 {
     public class DinheirCalculaService
     {
-        private CedulaRepository repCedula = new CedulaRepository();
-        private MoedaRepository repMoeda = new MoedaRepository();
+        private DinherioDadosRepository repDinheiro = new DinherioDadosRepository();
 
         /// <summary>
         /// Retorna a quantidade de cedulas e moedas a serem retornadas
         /// </summary>
         /// <param name="valor"></param>
         /// <returns></returns>
-        public List<string> DinheiroCalcula(decimal valor)
+        public List<string> DinheiroCalcula(decimal valorTotal, decimal valorPago)
         {
             List<string> lstRetorno = new List<string>();
-
-            var retCedula = CedulaCalcula(valor);
-
-            retCedula.Item2.ForEach(strCedula => 
-            {
-                lstRetorno.Add("Cedula - "+ strCedula);
-            });
+            List<Dinheiro> lstDinheiro = repDinheiro.Lista().ToList();
             
-            if (retCedula.Item1 > 0)
-                MoedaCalcula(retCedula.Item1).ForEach(retMoeda=> 
+            decimal troco = CalculaTroco(valorTotal, valorPago);
+
+            if (troco > 0)
+            {
+                var retCalculo = CalculaItensDinheiro(troco, lstDinheiro);
+
+                if (retCalculo != null)
+                    lstRetorno = retCalculo;
+                else
+                    lstRetorno.Add("Não foi possível fazer o cálculo");
+            }
+            else {
+                if (troco == 0)
                 {
-                    lstRetorno.Add("Moeda - " + retMoeda);
-                });
+                    lstRetorno.Add("Não há troco");
+                }
+                else {
+                    lstRetorno.Add(string.Format("O dinherio do pagamento não é o suficiente para o pagamento total. Faltam: {0}", troco * (-1) ));
+                }
+            }
             
             return lstRetorno;
         }
 
-        /// <summary>
-        /// Calcula a quantidade de cédulas a serem retornadas
-        /// </summary>
-        /// <param name="valor"></param>
-        /// <returns></returns>
-        private Tuple<decimal, List<String>> CedulaCalcula(decimal valor)
+        private decimal CalculaTroco(decimal valorTotal, decimal valorPago)
         {
-            List<String> lstTroco = new List<string>();
-            List<decimal> lstCedulaValores = new List<decimal>();
-            try
-            {
-                List<Cedula> lstCedulas = repCedula.Lista().ToList();
-
-                lstCedulas.ForEach(moeda => {
-                    lstCedulaValores.Add(moeda.valor);
-                });
-
-                var retTroco = CalculaTroco(valor, lstCedulaValores);
-
-                return retTroco;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            return valorPago - valorTotal;
         }
-
-        /// <summary>
-        /// Calcula a quantidade de moedas a serem retornadas.
-        /// </summary>
-        /// <param name="valor"></param>
-        /// <returns></returns>
-        private List<String> MoedaCalcula(decimal valor)
-        {
-            List<String> lstTroco = new List<string>();
-            List<decimal> lstMoedaValores = new List<decimal>();
-
-            try
-            {
-                List<Moeda> lstMoedas = repMoeda.Lista().ToList();
-
-                lstMoedas.ForEach(moeda => {
-                    lstMoedaValores.Add(moeda.valor);
-                });
-
-                var retTroco = CalculaTroco(valor, lstMoedaValores);
-                
-                return retTroco.Item2;
-
-            }
-            catch(Exception ex)
-            {
-                return null;
-            }
-        }
-
+        
         /// <summary>
         /// Método geral para retorno de quantidade de item
         /// </summary>
         /// <param name="valor"></param>
         /// <param name="lstValores"></param>
         /// <returns></returns>
-        private Tuple<decimal, List<String>> CalculaTroco(decimal valor, List<Decimal> lstValores )
+        private  List<String> CalculaItensDinheiro(decimal valor, List<Dinheiro> lstValores )
         {
             List<String> lstRetorno = new List<string>();
 
             try
             {
-                lstValores = lstValores.OrderByDescending(x => x).ToList();
+                lstValores = lstValores.OrderByDescending(x => x.valor).ToList();
 
                 foreach (var unidadeValor in lstValores)
                 {
-                    if (unidadeValor != 0)
+                    if (unidadeValor.valor != 0)
                     {
-                        int contagem = (int)(valor / unidadeValor);
-                        valor -= contagem * unidadeValor;
+                        int contagem = (int)(valor / unidadeValor.valor);
+                        valor -= contagem * unidadeValor.valor;
 
-                        lstRetorno.Add(string.Format("Quantidade: {0} - Valor: {1}", contagem.ToString(), unidadeValor.ToString()));
+                        lstRetorno.Add(string.Format("Quantidade: {0} - Valor: {1}", contagem.ToString(), unidadeValor.valor.ToString()));
                     }
 
                 }
-                return new Tuple<decimal, List<String>>(valor, lstRetorno);
+                return lstRetorno;
             }
             catch(Exception ex)
             {
