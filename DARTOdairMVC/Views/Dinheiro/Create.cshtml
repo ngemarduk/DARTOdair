@@ -1,0 +1,49 @@
+﻿@model DARTOdairMVC.Models.DinheiroModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="valorTotal" class="control-label"></label>
+                <input asp-for="valorTotal" class="form-control" />
+                <span asp-validation-for="valorTotal" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="valorPago" class="control-label"></label>
+                <input asp-for="valorPago" class="form-control" />
+                <span asp-validation-for="valorPago" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Calcular" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+    @if (ViewData["Retorno"] != null)
+    {
+        <ul>
+
+            @foreach (var linha in ViewData["Retorno"] as List<string>)
+            {
+                <li>
+                    @linha
+                </li>
+            }
+        </ul>
+
+    }
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -16,7 +16,13 @@ namespace DARTOdairMVC.Controllers
         {
             return View();
         }
-        
+
+
+        public ActionResult Create()
+        {
+            return View();
+        }
+
         // POST: Dinheiro/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -30,9 +36,11 @@ namespace DARTOdairMVC.Controllers
 
                     var retorno = objDinheiroCalcula.DinheiroCalcula(dinheiro.valorTotal, dinheiro.valorPago);
 
-                }
-                // TODO: Add insert logic here
+                    ViewData["Retorno"] = retorno;
+                    return View();
 
+                }
+                
                 return RedirectToAction(nameof(Index));
             }
             catch

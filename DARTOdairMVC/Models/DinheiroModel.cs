@@ -8,10 +8,12 @@ namespace DARTOdairMVC.Models
 {
     public class DinheiroModel
     {
+        [Display(Name = "Valor Total")]
         [Required(ErrorMessage = "Digite o valor total.")]
         [DataType(DataType.Currency)]
         public decimal valorTotal { get; set;}
 
+        [Display(Name = "Valor Pago")]
         [Required(ErrorMessage = "Digite o valor pago.")]
         [DataType(DataType.Currency)]
         public decimal valorPago { get; set; }
